@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float movementSpeed = 5.0f;
+    public float maxSpeed = 5.0f;
     public float acceleration = 5.0f;
     public float deceleration = 5.0f;
 
     Vector2 movementAxis;
     Vector2 movement;
-    // Update is called once per frame
+    Rigidbody2D rb;
+    void Start(){
+        rb = GetComponent<Rigidbody2D>();
+    }   
+
     void Update()
     {
         Movement();
@@ -21,18 +25,21 @@ public class PlayerMovement : MonoBehaviour
         movementAxis.y = Input.GetAxisRaw("Vertical");
         movementAxis.Normalize();
 
-        if(movementAxis.sqrMagnitude == 0 && movement.magnitude > 0){
-            // Deceleration
-            movement.x -= deceleration * Time.deltaTime;
-            movement.y -= deceleration * Time.deltaTime;
+        if(movementAxis.magnitude == 0){
+            // deceleration
+            movement.x = Mathf.Lerp(movement.x, 0, deceleration * Time.deltaTime);
+            movement.y = Mathf.Lerp(movement.y, 0, deceleration * Time.deltaTime);
         }else{
-            // Acceleration
-            movement.x += movementAxis.x * acceleration * Time.deltaTime;
-            movement.y += movementAxis.y * acceleration * Time.deltaTime;
-        }
-        Mathf.Clamp(movement.x, -movementSpeed, movementSpeed);
-        Mathf.Clamp(movement.y, -movementSpeed, movementSpeed);
+            // acceleration
+            if(movement.magnitude < maxSpeed){
+                movement.x = Mathf.Lerp(movement.x, movementAxis.x * maxSpeed, acceleration * Time.deltaTime);
+                movement.y = Mathf.Lerp(movement.y, movementAxis.y * maxSpeed, acceleration * Time.deltaTime);
 
-        transform.Translate(movement);
+                //movement.x += movementAxis.x * acceleration * Time.deltaTime;
+                //movement.y += movementAxis.y * acceleration * Time.deltaTime;
+            }
+        }
+        Debug.Log(movement);
+        rb.MovePosition(rb.position + movement);
     }
 }
