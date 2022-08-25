@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float maxSpeed = 5.0f;
-    public float acceleration = 5.0f;
-    public float deceleration = 5.0f;
+    public float maxSpeed = 50.0f;
+    public float acceleration = 50.0f;
+    public float deceleration = 50.0f;
 
     Vector2 movementAxis;
     Vector2 movement;
@@ -40,6 +40,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         Debug.Log(movement);
-        rb.MovePosition(rb.position + movement);
+        rb.velocity = movement;
     }
 }
