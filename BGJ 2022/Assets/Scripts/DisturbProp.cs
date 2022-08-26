@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class DisturbProp : MonoBehaviour
 {
+    [Header("Disturbance Settings")]
     [SerializeField] private float frequency = 45f;
     [Range(0.5f, 30f)]
     [SerializeField] private float disturbanceDegree = 5f;
     [Tooltip("How many times will this ghost disturb a prop to knock it over")]
     [SerializeField] private int disturbThreshold = 3;
+
+    [Header("SFX")]
+    [Tooltip("This will be the parent gameobject of all topple sound effects")]
+    [SerializeField] private Transform toppleSFX;
+    private AudioSource[] toppleSounds;
 
     private int currentDisturbThreshold = 0;
 
@@ -18,6 +24,8 @@ public class DisturbProp : MonoBehaviour
     private bool disturbRoutineRunning = false;
     private bool grounded = false;
 
+    private const string GROUND = "Ground";
+
     private Rigidbody2D rb;
     private Collider2D col;
 
@@ -25,12 +33,19 @@ public class DisturbProp : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+
+        toppleSounds = new AudioSource[toppleSFX.childCount];
+        for (int i = 0; i < toppleSounds.Length; i++)
+            toppleSounds[i] = toppleSFX.GetChild(i).GetComponent<AudioSource>();
     }
 
     private void Update()
     {
+#if UNITY_EDITOR
+        //This is for tests only!!
         if (Input.GetKeyUp(KeyCode.K))
             Disturb();
+#endif
     }
 
     public void Disturb()
@@ -90,12 +105,17 @@ public class DisturbProp : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        grounded = collision.gameObject.layer.Equals(LayerMask.NameToLayer("Ground"));
+        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer(GROUND)))
+        {
+            grounded = true;
+            int toppleSoundIndex = Random.Range(0, toppleSounds.Length);
+            toppleSounds[toppleSoundIndex].Play();
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer(GROUND)))
             grounded = false;
     }
 }
