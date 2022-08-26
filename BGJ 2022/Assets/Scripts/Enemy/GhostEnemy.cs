@@ -16,6 +16,7 @@ public class GhostEnemy : MonoBehaviour
     [Header("Interaction with player")]
     [Tooltip("How close will this ghost be to the player in order to recognize their presence")]
     [SerializeField] private float minDistToPlayer;
+    [SerializeField] private int attackStrength = 3;
 
     private float acceleration = 0f;
 
@@ -26,7 +27,7 @@ public class GhostEnemy : MonoBehaviour
 
     private Vector2 waypointDirection;
 
-    private PlayerMovement player;
+    private PlayerDogBehavior player;
 
     private void Awake()
     {
@@ -36,7 +37,7 @@ public class GhostEnemy : MonoBehaviour
 
     private void Start()
     {
-        player = PlayerMovement.Instance;
+        player = PlayerDogBehavior.Instance;
 
         UpdateWaypoint();
     }
@@ -72,9 +73,15 @@ public class GhostEnemy : MonoBehaviour
 
         Color color = sprite.color;
         if (dirToPlayer.magnitude <= minDistToPlayer)
+        {
+            player.DetectGhostlyPresence(this);
             color.a = Mathf.Clamp((minDistToPlayer - dirToPlayer.sqrMagnitude) / minDistToPlayer, 0f, 1f);
+        }
         else
+        {
+            player.DetectGhostlyPresence(null);
             color.a = 0f;
+        }
 
         sprite.color = color;
     }
@@ -83,5 +90,8 @@ public class GhostEnemy : MonoBehaviour
     {
         if (other.TryGetComponent(out DisturbProp prop))
             prop.Disturb();
+
+        if (other.TryGetComponent(out PlayerDogBehavior playerDog))
+            playerDog.Damage(attackStrength);
     }
 }
