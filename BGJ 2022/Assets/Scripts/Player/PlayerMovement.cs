@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
 
     [SerializeField] private float walkSpeed = 3f;
-    [Tooltip("This is the amount of force that will be given to the character in order to accelerate. The higher this value is, the faster the player reaches its run/walk speed")]
+    [Tooltip("This is the rate of acceleration. The higher this value is, the faster the player accelerates to its run/walk speed")]
     [SerializeField] private float workForce = 1f;
     [SerializeField] private float runSpeed = 7f;
 
@@ -28,11 +28,6 @@ public class PlayerMovement : MonoBehaviour
             acceleration = Mathf.Lerp(acceleration, GetSpeed(), workForce * Time.deltaTime);        //gradually reach the walkspeed or runspeed over time
         else
             acceleration = 0f;
-
-        /*if (movementVector.x > 0f){}
-            // Flip
-        else if (movementVector.x < 0f){}
-            // Flip*/
     }
 
     private void FixedUpdate()
