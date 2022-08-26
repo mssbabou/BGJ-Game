@@ -13,8 +13,15 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 movementVector;
 
+    public static PlayerMovement Instance;
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+            Destroy(this);
+        else
+            Instance = this;
+
         rb = GetComponent<Rigidbody2D>();
     }
 
